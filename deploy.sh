@@ -31,24 +31,39 @@ if ! command -v terraform &> /dev/null; then
     sudo apt-get update && sudo apt-get install -y terraform
 fi
 
-# Get current project as default
-DEFAULT_PROJECT=$(gcloud config get-value project 2>/dev/null || echo "")
-
 echo -e "${GREEN}Please provide the following information:${NC}"
 echo ""
 
-# Project ID
-if [ -n "$DEFAULT_PROJECT" ]; then
-    read -p "GCP Project ID [$DEFAULT_PROJECT]: " PROJECT_ID
-    PROJECT_ID=${PROJECT_ID:-$DEFAULT_PROJECT}
-else
+# Project ID - list available projects for selection
+echo -e "${GREEN}Available GCP Projects:${NC}"
+mapfile -t PROJECTS < <(gcloud projects list --format="value(projectId)" 2>/dev/null)
+
+if [ ${#PROJECTS[@]} -eq 0 ]; then
+    echo "  No projects found. Please enter your project ID manually."
     read -p "GCP Project ID: " PROJECT_ID
+else
+    for i in "${!PROJECTS[@]}"; do
+        echo "  $((i+1))) ${PROJECTS[$i]}"
+    done
+    echo ""
+    echo "Enter a number to select, or type a project ID manually:"
+    read -p "Project: " PROJECT_INPUT
+
+    # Check if input is a number
+    if [[ "$PROJECT_INPUT" =~ ^[0-9]+$ ]] && [ "$PROJECT_INPUT" -ge 1 ] && [ "$PROJECT_INPUT" -le ${#PROJECTS[@]} ]; then
+        PROJECT_ID="${PROJECTS[$((PROJECT_INPUT-1))]}"
+    else
+        PROJECT_ID="$PROJECT_INPUT"
+    fi
 fi
 
 if [ -z "$PROJECT_ID" ]; then
     echo -e "${RED}Error: Project ID is required${NC}"
     exit 1
 fi
+
+echo -e "${GREEN}Selected project: $PROJECT_ID${NC}"
+echo ""
 
 # Admin email
 read -p "Google Workspace Admin Email (e.g., admin@company.com): " ADMIN_EMAIL
