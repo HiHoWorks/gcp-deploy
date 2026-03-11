@@ -55,6 +55,7 @@ resource "google_service_account_key" "hiho_worker" {
 # VPC network (use default or create dedicated)
 data "google_compute_network" "default" {
   name = "default"
+  depends_on = [google_project_service.apis]
 }
 
 # Firewall rule for health checks

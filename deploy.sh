@@ -75,9 +75,7 @@ fi
 
 # API Token
 echo ""
-echo -e "${YELLOW}Enter your HiHo API token (input will be hidden):${NC}"
-read -sp "API Token: " API_TOKEN
-echo ""
+read -p "HiHo API Token: " API_TOKEN
 
 if [ -z "$API_TOKEN" ]; then
     echo -e "${RED}Error: API token is required${NC}"
