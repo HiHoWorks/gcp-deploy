@@ -1,4 +1,4 @@
-# HiHo Worker - Google Cloud Deployment
+# HiHo Worker - Google Cloud Deployment (Production)
 
 This Terraform configuration deploys the HiHo sentiment analysis worker to Google Cloud Platform.
 
@@ -86,6 +86,10 @@ curl http://$(terraform output -raw vm_external_ip):8080/health
 To remove all resources:
 
 ```bash
+# If you get Cloud Resource Manager API errors, enable it first:
+gcloud services enable cloudresourcemanager.googleapis.com --project=YOUR_PROJECT_ID
+
+# Then destroy
 terraform destroy
 ```
 
